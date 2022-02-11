@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #080;
+  max-width: 420px;
+  padding: 20px;
+}
+
+.label {
+  margin: 5px;
+}
