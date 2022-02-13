@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import { LENGTH_INPUT_PASSWORD } from '../data/Data';
 import { setUserEmail } from '../store/actions';
 
+import '../styles/Login.css';
+
 class Login extends Component {
   constructor() {
     super();
@@ -24,6 +26,7 @@ class Login extends Component {
   validateEmail = (email) => {
     const rex = /\S+@\S+\.\S+/;
     return rex.test(email);
+    // https://www.horadecodar.com.br/2020/09/13/como-validar-email-com-javascript/
   }
 
   validateLogin = () => {
@@ -33,7 +36,6 @@ class Login extends Component {
     } else {
       this.setState({ isDisabled: true });
     }
-    // https://www.horadecodar.com.br/2020/09/13/como-validar-email-com-javascript/
   }
 
   handleClick = () => {
@@ -47,9 +49,12 @@ class Login extends Component {
     const { inputEmail, inputPassword, isDisabled } = this.state;
 
     return (
-      <div>
-        <form>
-          <label htmlFor="email">
+      <div className="container">
+        <form className="form">
+          <label
+            htmlFor="email"
+            className="label"
+          >
             Usuario
             <input
               type="email"
@@ -61,6 +66,7 @@ class Login extends Component {
             />
           </label>
           <label
+            className="label"
             htmlFor="password"
           >
             Senha
@@ -77,6 +83,7 @@ class Login extends Component {
             type="button"
             onClick={ this.handleClick }
             disabled={ isDisabled }
+            className="button"
           >
             Entrar
           </button>
