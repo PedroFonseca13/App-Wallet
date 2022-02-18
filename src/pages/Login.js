@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { LENGTH_INPUT_PASSWORD } from '../data/Data';
-import { setUserEmail } from '../store/actions';
+import { setUserEmail } from '../actions/userActions';
 
 import '../styles/Login.css';
 
