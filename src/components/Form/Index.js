@@ -74,7 +74,7 @@ class Form extends Component {
     const { moedas, value, description, method, tag } = this.state;
     return (
       <div className="">
-        <form className="">
+        <form className="form-header">
           <label htmlFor="value">
             Valor $
             <input
