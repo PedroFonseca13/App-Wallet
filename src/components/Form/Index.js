@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { addExpenses } from '../../store/actions';
+import { addExpenses, fetchTunk } from '../../actions/walletActions';
+import fetchApi from '../../services/fetch';
 import './Form.css';
 
 class Form extends Component {
@@ -11,10 +12,25 @@ class Form extends Component {
     this.state = {
       value: 0,
       description: '',
-      currency: '',
-      method: '',
-      tag: '',
+      currency: 'USD',
+      method: 'Dinheiro',
+      tag: 'Alimentação',
+      moedas: [],
+      exchangeRates: {},
     };
+  }
+
+  componentDidMount() {
+    this.getCoins();
+  }
+
+  getCoins = async () => {
+    const coins = await fetchApi();
+    this.setState({
+      moedas: Object.keys(coins).filter((coin) => coin !== 'USDT'),
+      exchangeRates: coins,
+    });
+    return coins;
   }
 
   handleChange = ({ target }) => {
@@ -22,25 +38,40 @@ class Form extends Component {
     this.setState({ [name]: value });
   };
 
-  getStaged = async () => {
-    const response = await fetch('https://economia.awesomeapi.com.br/json/all');
-    const data = response.json();
-    return data;
-  }
+  handleClick = () => {
+    const { expensesAction, fetchTunkApi } = this.props;
+    const {
+      currency,
+      description,
+      exchangeRates,
+      method,
+      tag,
+      value,
+    } = this.state;
+    const expensesObj = {
+      currency,
+      description,
+      exchangeRates,
+      method,
+      tag,
+      value,
+    };
 
-  handleSave = () => {
-    const { addNewExpenses } = this.props;
-    // const staged = await this.getStaged();
-    addNewExpenses(this.state);
+    expensesAction(expensesObj);
+
+    fetchTunkApi();
+
     this.setState({
       value: 0,
       description: '',
+      currency: '',
+      method: '',
+      tag: '',
     });
   }
 
   render() {
-    const { value, description } = this.state;
-
+    const { moedas, value, description, method, tag } = this.state;
     return (
       <div className="">
         <form className="">
@@ -62,19 +93,28 @@ class Form extends Component {
               type="text"
               data-testid="description-input"
               name="description"
-              onChange={ this.handleChange }
               value={ description }
+              onChange={ this.handleChange }
             />
           </label>
           <label htmlFor="currency">
             Moeda
-            <input
+            <select
               id="currency"
               type="text"
               data-testid="currency-input"
               name="currency"
               onChange={ this.handleChange }
-            />
+            >
+              { moedas.map((coin) => (
+                <option
+                  key={ coin }
+                  data-testid={ coin }
+                  value={ coin }
+                >
+                  { coin }
+                </option>))}
+            </select>
           </label>
           <label htmlFor="method">
             Método de pagamento
@@ -82,11 +122,12 @@ class Form extends Component {
               id="method"
               data-testid="method-input"
               name="method"
+              value={ method }
               onChange={ this.handleChange }
             >
-              <option value="dinheiro">Dinheiro</option>
-              <option value="cartao de credito">Cartão de crédito</option>
-              <option value="cartao de debito">Cartão de débito</option>
+              <option>Dinheiro</option>
+              <option>Cartão de crédito</option>
+              <option>Cartão de débito</option>
             </select>
           </label>
 
@@ -96,16 +137,17 @@ class Form extends Component {
               id="tag"
               data-testid="tag-input"
               name="tag"
+              value={ tag }
               onChange={ this.handleChange }
             >
-              <option value="Alimentacao">Alimentação</option>
-              <option value="Lazer">Lazer</option>
-              <option value="Trabalho">Trabalho</option>
-              <option value="Transporte">Transporte</option>
-              <option value="Saude">Saúde</option>
+              <option>Alimentação</option>
+              <option>Lazer</option>
+              <option>Trabalho</option>
+              <option>Transporte</option>
+              <option>Saúde</option>
             </select>
           </label>
-          <button type="button" onClick={ this.handleSave }>Adicionar despesa</button>
+          <button type="button" onClick={ this.handleClick }>Adicionar despesa</button>
           {/* data-testid="total-field" */}
         </form>
       </div>
@@ -114,11 +156,18 @@ class Form extends Component {
 }
 
 Form.propTypes = {
-  addExpenses: PropTypes.func,
+  coinsOptions: PropTypes.func,
+  fetchCurrency: PropTypes.func,
 }.isRequired;
 
 const mapDispatchToProps = (dispatch) => ({
-  addNewExpenses: (expenses) => dispatch(addExpenses(expenses)),
+  fetchTunkApi: () => dispatch(fetchTunk()),
+  expensesAction: (payload) => dispatch(addExpenses(payload)),
 });
 
-export default connect(null, mapDispatchToProps)(Form);
+const mapStateToProps = ({ wallet }) => ({
+  expenses: wallet.expenses,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
+// 1:13

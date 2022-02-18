@@ -6,6 +6,15 @@ import { connect } from 'react-redux';
 import './style.css';
 
 class Header extends Component {
+  valorTotal = () => {
+    const { expenses } = this.props;
+    let total = 0;
+    expenses.forEach(({ value, exchangeRates, currency }) => {
+      total += (Number(value) * Number(exchangeRates[currency].ask));
+    });
+    return total.toFixed(2);
+  }
+
   render() {
     const { email } = this.props;
 
@@ -23,7 +32,7 @@ class Header extends Component {
           <div data-testid="total-field">
             <MdAttachMoney />
             {' '}
-            0
+            {this.valorTotal()}
             <span data-testid="header-currency-field">{' BRL'}</span>
           </div>
         </div>
@@ -36,8 +45,9 @@ Header.propTypes = {
   email: PropTypes.any,
 }.isRequired;
 
-const mapStateToProps = ({ loginReducer }) => ({
-  email: loginReducer.email,
+const mapStateToProps = ({ user, wallet }) => ({
+  email: user.email,
+  expenses: wallet.expenses,
 });
 
 export default connect(mapStateToProps)(Header);
